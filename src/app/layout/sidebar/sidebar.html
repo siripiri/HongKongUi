@@ -1,0 +1,50 @@
+<div class="flex h-screen bg-gray-100">
+  
+  <!-- Sidebar -->
+  <div class="w-64 bg-white shadow-md">
+    
+    <!-- Logo -->
+    <div class="p-4 text-xl font-bold border-b">
+      Hong Kong Cutpieces and Readymades
+    </div>
+
+    <!-- Menu -->
+    <nav class="p-4 space-y-2 text-gray-700">
+      
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2" routerLink=''>Dashboard</span>
+      </a>
+
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2" routerLink='purchases'>Purchases</span>
+      </a>
+
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2">Clients</span>
+      </a>
+
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2">Payments</span>
+      </a>
+
+      <hr class="my-3">
+
+      <p class="text-xs text-gray-400 px-2">ADMIN PANEL</p>
+
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2">Customer</span>
+      </a>
+
+      <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
+        <span class="ml-2">Profile</span>
+      </a>
+
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 p-6">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>
