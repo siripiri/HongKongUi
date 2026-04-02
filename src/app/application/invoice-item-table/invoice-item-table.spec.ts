@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Sidebar } from './sidebar';
+import { InvoiceItemTable } from './invoice-item-table';
 
-describe('Sidebar', () => {
-  let component: Sidebar;
-  let fixture: ComponentFixture<Sidebar>;
+describe('InvoiceItemTable', () => {
+  let component: InvoiceItemTable;
+  let fixture: ComponentFixture<InvoiceItemTable>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Sidebar],
+      imports: [InvoiceItemTable],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Sidebar);
+    fixture = TestBed.createComponent(InvoiceItemTable);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

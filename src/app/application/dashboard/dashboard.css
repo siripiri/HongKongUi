@@ -1,0 +1,26 @@
+.custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  .mat-mdc-header-cell {
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .mat-mdc-row {
+    &:last-child .mat-mdc-cell {
+      border-bottom: none;
+    }
+    
+    transition: background-color 0.2s ease;
+  }
+}
+
+.mat-mdc-form-field {
+  --mat-mdc-form-field-container-height: 44px;
+  --mat-mdc-form-field-container-vertical-padding: 6px;
+}
+
+.filter-compact .mat-mdc-form-field {
+  --mat-mdc-form-field-container-height: 44px;
+  --mat-mdc-form-field-container-vertical-padding: 6px;
+}

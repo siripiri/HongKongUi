@@ -1,0 +1,167 @@
+<div class="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-4 mb-6">
+    <div class="flex items-center justify-between mb-6">
+
+        <div class="flex items-center gap-3">
+
+            <!-- Icon -->
+            <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
+                <mat-icon class="text-slate-700 text-[22px]">
+                    {{ isEditMode ? 'edit_document' : 'receipt_long' }}
+                </mat-icon>
+            </div>
+
+            <!-- Text -->
+            <div>
+                <h2 class="text-xl font-semibold text-slate-900 leading-tight">
+                    {{ isEditMode ? 'Edit Invoice' : 'Create Invoice' }}
+                </h2>
+                <p class="text-sm text-slate-500">
+                    {{ isEditMode
+                    ? 'Update invoice details and save changes'
+                    : 'Enter invoice details for your client'
+                    }}
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+        <!-- Row 1 -->
+        <!-- Invoice Number -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Invoice Number</mat-label>
+            <input matInput formControlName="invoiceNo" placeholder="Enter invoice number">
+        </mat-form-field>
+
+        <!-- Order Number -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Order Number</mat-label>
+            <input matInput formControlName="orderNo" placeholder="Enter order number">
+        </mat-form-field>
+
+        <!-- Status -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+                <mat-option value="paid">Paid</mat-option>
+                <mat-option value="pending">Unpaid</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Client -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Client</mat-label>
+            <input matInput formControlName="clientName" placeholder="Search client...">
+        </mat-form-field>
+
+        <!-- Row 2 -->
+        <!-- Invoice Date -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Invoice Date</mat-label>
+            <input matInput [matDatepicker]="invoicePicker" formControlName="invoiceDate">
+            <mat-datepicker-toggle matSuffix [for]="invoicePicker"></mat-datepicker-toggle>
+            <mat-datepicker #invoicePicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Due Date -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+            <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+            <mat-datepicker #duePicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Empty placeholders for alignment -->
+        <div class="hidden xl:block"></div>
+        <div class="hidden xl:block"></div>
+
+    </form>
+</div>
+
+<app-invoice-item-table></app-invoice-item-table>
+
+<!-- Payment Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Payment Table -->
+    <div>
+        <app-payment-item-table></app-payment-item-table>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-4">
+        <div class="flex items-center gap-2 mb-4">
+            <div class="p-1.5 rounded-lg bg-slate-100 border border-slate-200">
+                <mat-icon class="text-slate-700 text-lg">receipt_long</mat-icon>
+            </div>
+            <div>
+                <h3 class="text-base font-semibold text-slate-900">Invoice Summary</h3>
+                <p class="text-xs text-slate-500">summary of invoice details</p>
+            </div>
+        </div>
+
+        <form class="space-y-3">
+            <!-- Row 1: Payment Mode & Amount -->
+            <div class="grid grid-cols-2 gap-3">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Total</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Shipping</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+            </div>
+
+            <!-- Row 2: Payment Date & Reference -->
+            <div class="grid grid-cols-2 gap-3">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Invoice Tax</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Grand Total</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+            </div>
+
+            <!-- Row 3: Bank Name & Account -->
+            <div class="grid grid-cols-2 gap-3">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Paid</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Balance</mat-label>
+                    <input matInput type="number" placeholder="0">
+                    <span matPrefix>₹</span>
+                </mat-form-field>
+            </div>
+
+            <!-- Notes -->
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Notes</mat-label>
+                <textarea matInput rows="2" placeholder="Payment notes"></textarea>
+            </mat-form-field>
+
+            <!-- Save Button -->
+            <button mat-flat-button color="primary" type="submit"
+                class="w-full !h-[40px] !rounded-lg shadow-indigo-200 shadow-md hover:shadow-none transition-all !text-sm">
+                <mat-icon class="mr-1 !text-base">save</mat-icon>
+                Save Invoice
+            </button>
+        </form>
+    </div>
+</div>
+
