@@ -24,7 +24,6 @@
             </div>
 
         </div>
-
     </div>
 
     <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)"
@@ -91,7 +90,7 @@
         <app-payment-item-table></app-payment-item-table>
     </div>
 
-    <!-- Payment Form -->
+    <!-- Summary Form -->
     <div class="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-4">
         <div class="flex items-center gap-2 mb-4">
             <div class="p-1.5 rounded-lg bg-slate-100 border border-slate-200">
@@ -109,13 +108,13 @@
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Total</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Shipping</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
             </div>
 
@@ -124,13 +123,13 @@
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Invoice Tax</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Grand Total</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
             </div>
 
@@ -139,13 +138,13 @@
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Paid</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Balance</mat-label>
                     <input matInput type="number" placeholder="0">
-                    <span matPrefix>₹</span>
+                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
             </div>
 

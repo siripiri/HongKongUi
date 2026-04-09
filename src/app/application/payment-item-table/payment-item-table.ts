@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { AddPayment } from '../add-payment/add-payment';
 
 @Component({
   selector: 'app-payment-item-table',
@@ -16,6 +18,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './payment-item-table.css',
 })
 export class PaymentItemTable {
+  private dialog = inject(MatDialog);
 
   displayedColumns: string[] = ['paymentMode', 'amount', 'date', 'note'];
   dataSource = new MatTableDataSource([
@@ -25,4 +28,16 @@ export class PaymentItemTable {
     { paymentMode: 'UPI', amount: 150, date: new Date('2024-01-15'), note: 'Payment sent via UPI' },
     { paymentMode: 'Cheque', amount: 250, date: new Date('2024-01-20'), note: 'Payment sent via cheque' },
   ])
+
+  openAddPaymentDialog() {
+    const dialogRef = this.dialog.open(AddPayment, {
+      width: '800px',
+      maxWidth: '90vw',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // get result
+    });
+  }
 }

@@ -1,7 +1,7 @@
 <div class="flex h-screen bg-gray-100">
   
   <!-- Sidebar -->
-  <div class="w-64 bg-white shadow-md">
+  <div class="w-64 bg-white shadow-md min-h-screen">
     
     <!-- Logo -->
     <div class="p-4 text-xl font-bold border-b">
@@ -20,7 +20,7 @@
       </a>
 
       <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
-        <span class="ml-2">Clients</span>
+        <span class="ml-2" routerLink='client'>Clients</span>
       </a>
 
       <a class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
@@ -44,7 +44,7 @@
 
   <!-- Main Content -->
   <div class="flex-1">
-    <div class="p-8 bg-gradient-to-br from-[#F4F4F5] to-slate-200 min-h-screen text-slate-800">
+    <div class="p-8 bg-gradient-to-br from-[#F4F4F5] to-slate-200 h-full overflow-y-auto text-slate-800">
       <app-header></app-header>
       <router-outlet></router-outlet>
     </div>
