@@ -6,17 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-
-export interface InvoiceItem {
-  productType: string;
-  price: number;
-  quantity: number;
-  discount: number;
-  sgst: number;
-  cgst: number;
-  tgst: number;
-  amount: number;
-}
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-add-invoice-item',
@@ -27,8 +18,10 @@ export interface InvoiceItem {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
-  ],
+    MatIconModule,
+    MatSelectModule,
+    MatAutocompleteModule
+],
   templateUrl: './add-invoice-item.html',
   styleUrl: './add-invoice-item.css',
 })
@@ -37,14 +30,19 @@ export class AddInvoiceItem {
   private dialogRef = inject(MatDialogRef<AddInvoiceItem>);
 
   itemForm: FormGroup = this.fb.group({
+    id: [0],
     productType: ['', Validators.required],
-    price: [0, [Validators.required, Validators.min(0)]],
+    hsnCode: [''],
+    rate: [0],
+    unit: ['Pcs'],
+    unitPrice: [0, [Validators.required]],
     quantity: [1, [Validators.required, Validators.min(1)]],
     discount: [0, [Validators.min(0), Validators.max(100)]],
+    taxableAmount: [0, [Validators.required]],
     sgst: [0, [Validators.min(0), Validators.max(100)]],
     cgst: [0, [Validators.min(0), Validators.max(100)]],
-    tgst: [0, [Validators.min(0), Validators.max(100)]],
-    amount: [0, [Validators.required, Validators.min(0)]]
+    igst: [0, [Validators.min(0), Validators.max(100)]],
+    totalAmount: [0]
   });
 
   onSave() {
@@ -57,16 +55,15 @@ export class AddInvoiceItem {
     this.dialogRef.close();
   }
 
-  // Calculate amount automatically when price, quantity, or discount changes
   calculateAmount() {
-    const price = this.itemForm.get('price')?.value || 0;
+    const price = this.itemForm.get('unitPrice')?.value || 0;
     const quantity = this.itemForm.get('quantity')?.value || 0;
     const discount = this.itemForm.get('discount')?.value || 0;
 
     const subtotal = price * quantity;
     const discountAmount = subtotal * (discount / 100);
-    const amount = subtotal - discountAmount;
+    let amount = subtotal - discountAmount;
 
-    this.itemForm.patchValue({ amount: amount });
+    this.itemForm.patchValue({ taxableAmount: amount });
   }
 }

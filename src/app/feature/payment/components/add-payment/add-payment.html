@@ -1,0 +1,83 @@
+<div class="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-4 mb-6">
+    <div class="flex items-center justify-between mb-6">
+
+        <div class="flex items-center gap-3">
+            <!-- Icon -->
+            <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
+                <mat-icon class="text-slate-700 text-[22px]">
+                    {{ isEditMode ? 'edit_document' : 'receipt_long' }}
+                </mat-icon>
+            </div>
+            <!-- Text -->
+            <div>
+                <h2 class="text-xl font-semibold text-slate-900 leading-tight">
+                    {{ isEditMode ? 'Edit Payment' : 'Create Payment' }}
+                </h2>
+                <p class="text-sm text-slate-500">
+                    {{ isEditMode
+                    ? 'Update payment details and save changes'
+                    : 'Enter payment details for your client'
+                    }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form [formGroup]="paymentForm" 
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+        <!-- Row 1 -->
+        <!-- Payment Type -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Payment Type</mat-label>
+            <mat-select formControlName="paymentType">
+                <mat-option value="Cheque">CHEQUE</mat-option>
+                <mat-option value="UPI">UPI</mat-option>
+                <mat-option value="Cash">Cash</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Amount -->
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Amount</mat-label>
+            <input matInput formControlName="amount" placeholder="Enter Amount">
+        </mat-form-field>
+
+        <!-- Payment Date -->
+         <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Payment Date</mat-label>
+            <input matInput [matDatepicker]="paymentPicker" formControlName="paymentDate">
+            <mat-datepicker-toggle matSuffix [for]="paymentPicker"></mat-datepicker-toggle>
+            <mat-datepicker #paymentPicker></mat-datepicker>
+        </mat-form-field>
+        
+        @if (isCheque) {
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Cheque Number</mat-label>
+                <input matInput formControlName="chequeNumber">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Cheque Due Date</mat-label>
+                 <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+                <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+                <mat-datepicker #duePicker></mat-datepicker>
+            </mat-form-field> 
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Bank Name</mat-label>
+                <mat-select formControlName="bankName">
+                    <mat-option value="SBI">SBI</mat-option>
+                    <mat-option value="IOB">IOB</mat-option>
+                    <mat-option value="Canara Bank">Canara Bank</mat-option>
+                </mat-select>
+            </mat-form-field>
+        } @else if (true) {
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Reference Id</mat-label>
+                <input matInput formControlName="referenceId">
+            </mat-form-field>
+        }
+    </form>
+</div>
+
+<app-purchase-table [amount]="amount"></app-purchase-table>
+

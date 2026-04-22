@@ -1,6 +1,7 @@
 import { Injectable, signal } from "@angular/core";
 import { ClientService } from "../service/client.service";
 import { ClientData } from "../model/client.model";
+import { tap } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class ClientStore {    
@@ -14,6 +15,7 @@ export class ClientStore {
 
         this.api.getClients().subscribe({
             next: (data) => {
+                console.log(data);
                 this.clients.set(data);
                 this.loading.set(false);
             },
@@ -22,6 +24,10 @@ export class ClientStore {
     }
 
     addClient(client: ClientData) {
-        this.clients.update(list => [...list, client]);
+        return this.api.addClient(client).pipe(
+            tap((added: ClientData) => {
+                this.clients.update(list => [...list, added]);
+            })
+        );
     }
 }

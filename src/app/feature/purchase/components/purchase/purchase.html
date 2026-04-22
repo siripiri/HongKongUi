@@ -1,0 +1,124 @@
+<div class="mb-8 transition-all duration-300 hover:translate-y-[-2px]">
+    <app-header-cards [cardContents]="headerCards"></app-header-cards>
+</div>
+
+<form [formGroup]="filterForm" (ngSubmit)="search()">
+    <div
+        class="flex flex-wrap lg:flex-nowrap items-center gap-3 bg-white/90 backdrop-blur-md border border-slate-200 p-3 rounded-xl shadow-sm mb-6 transition-all hover:border-slate-300">
+
+        <div class="hidden lg:flex items-center justify-center px-3 border-r border-slate-200 text-slate-400">
+            <mat-icon class="!text-xl">filter_alt</mat-icon>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full lg:w-44" subscriptSizing="dynamic">
+            <mat-label>From</mat-label>
+            <input matInput [matDatepicker]="fromPicker" formControlName="dateFrom">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full lg:w-44" subscriptSizing="dynamic">
+            <mat-label>To</mat-label>
+            <input matInput [matDatepicker]="toPicker" formControlName="dateTo">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full lg:flex-1 min-w-[150px]" subscriptSizing="dynamic">
+            <mat-label>Client</mat-label>
+            <input matInput formControlName="clientName" placeholder="Search..." [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let client of filteredClients | async" [value]="client.companyName">
+                    {{ client.companyName }}
+                </mat-option>
+            </mat-autocomplete>
+            <mat-icon matPrefix class="text-slate-400 mr-2 !text-lg">search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full lg:w-40" subscriptSizing="dynamic">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+                <mat-option value="PAID">PAID</mat-option>
+                <mat-option value="UNPAID">UNPAID</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="flex items-center gap-2 ml-auto">
+            <button type="button" mat-icon-button
+                class="!h-[48px] !w-[48px] !rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50"
+                matTooltip="Reset"
+                (click)="reset()">
+                <mat-icon>refresh</mat-icon>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl mb-8">
+        <!-- Header with Button -->
+    <div class="flex items-center justify-between p-4 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-slate-100 border border-slate-200">
+                <mat-icon class="text-slate-700 text-lg">inventory_2</mat-icon>
+            </div>
+            <div>
+                <h3 class="text-base font-semibold text-slate-900">Invoice Items</h3>
+                <p class="text-xs text-slate-500">Manage invoice line items</p>
+            </div>
+        </div>
+
+        <button mat-flat-button color="primary" class="!h-[36px] !rounded-lg !px-3 shadow-indigo-200 shadow-sm hover:shadow-none transition-all"
+                (click)="addInvoice()">
+            <mat-icon class="mr-1 !text-sm">add</mat-icon>
+            Add Item
+        </button>
+    </div>
+    <div class="overflow-x-auto max-h-[250px]">
+        <table mat-table [dataSource]="dataSource" class="w-full custom-table">
+
+            <ng-container *ngFor="let column of dataColumns" [matColumnDef]="column">
+                    <th mat-header-cell *matHeaderCellDef class="...">
+                        {{ column | titlecase }}
+                    </th>
+                    <td mat-cell *matCellDef="let el" class="font-medium text-slate-700">
+                        {{ getValue(el, column) ?? '-' }}
+                    </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef class="...">
+                Action
+                </th>
+                <td mat-cell *matCellDef="let el" class="text-center">
+                    <div class="flex gap-1 justify-center">
+
+                        <button mat-icon-button class="text-slate-400 hover:text-indigo-600"
+                                (click)="view(el)" matTooltip="View">
+                        <mat-icon>visibility</mat-icon>
+                        </button>
+
+                        <button mat-icon-button class="text-slate-400 hover:text-emerald-600"
+                                (click)="edit(el)" matTooltip="Edit">
+                        <mat-icon>edit_note</mat-icon>
+                        </button>
+
+                        <button mat-icon-button class="text-slate-400 hover:text-rose-600"
+                                (click)="delete(el)" matTooltip="Delete">
+                        <mat-icon>delete_outline</mat-icon>
+                        </button>
+
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+            </tr>
+
+        </table>
+    </div>
+
+    <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons class="!bg-white py-2">
+    </mat-paginator>
+</div>

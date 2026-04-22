@@ -33,14 +33,16 @@ export class HeaderComponent {
   }
 
   buildBreadcrumb(route: ActivatedRoute, breadcrumbs: string[] = []): string[] {
-    if (route.routeConfig && route.routeConfig.data?.['breadcrumb']) {
-      breadcrumbs.push(route.routeConfig.data['breadcrumb']);
+    const label = route.routeConfig?.data?.['breadcrumb'];
+    if (label) {
+      breadcrumbs.push(label);
     }
-
-    if (route.firstChild) {
-      return this.buildBreadcrumb(route.firstChild, breadcrumbs);
+    const id = route.snapshot.paramMap.get('id');
+    if (id) {
+      breadcrumbs.push(id);
     }
-
-    return breadcrumbs;
+    return route.firstChild
+      ? this.buildBreadcrumb(route.firstChild, breadcrumbs)
+      : breadcrumbs;
   }
 }

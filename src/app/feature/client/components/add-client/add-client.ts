@@ -24,17 +24,20 @@ export class AddClient {
   private dialogRef = inject(MatDialogRef<AddClient>);
 
   clientForm: FormGroup = this.fb.group({
+    id: [0],
     companyName: ['', Validators.required],
-    gstNo: ['', Validators.required],
+    gst: [''],
     address: this.fb.group({
+      id: [0],
       street1: ['', Validators.required],
       street2: ['', Validators.required],
       city: ['', Validators.required],
       state: ['', Validators.required],
+      country: ['India'],
       pincode: ['', Validators.required],
     }),
-    email: ['', [Validators.required, Validators.email]],
-    phoneNumber: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]]
+    email: [''],
+    phoneNumber: ['']
   });
   
   onCancel() {
@@ -44,6 +47,7 @@ export class AddClient {
   onSave() {
     if (this.clientForm.valid) {
       const clientData: ClientData = this.clientForm.value;
+      console.log("Form Value", clientData)
       this.dialogRef.close(clientData);
       return;
     }

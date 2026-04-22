@@ -26,36 +26,24 @@
         </div>
     </div>
 
-    <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value)"
+    <form [formGroup]="invoiceForm"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
         <!-- Row 1 -->
         <!-- Invoice Number -->
         <mat-form-field appearance="outline" class="w-full">
             <mat-label>Invoice Number</mat-label>
-            <input matInput formControlName="invoiceNo" placeholder="Enter invoice number">
+            <input matInput formControlName="invoiceNumber" placeholder="Enter invoice number">
         </mat-form-field>
 
         <!-- Order Number -->
         <mat-form-field appearance="outline" class="w-full">
             <mat-label>Order Number</mat-label>
-            <input matInput formControlName="orderNo" placeholder="Enter order number">
+            <input matInput formControlName="orderNumber" placeholder="Enter order number">
         </mat-form-field>
 
-        <!-- Status -->
-        <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status">
-                <mat-option value="paid">Paid</mat-option>
-                <mat-option value="pending">Unpaid</mat-option>
-            </mat-select>
-        </mat-form-field>
-
-        <!-- Client -->
-        <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Client</mat-label>
-            <input matInput formControlName="clientName" placeholder="Search client...">
-        </mat-form-field>
+        <!-- Client Name -->
+        <autocomplete-client [clientName]="client" class="w-full lg:col-span-2"></autocomplete-client>
 
         <!-- Row 2 -->
         <!-- Invoice Date -->
@@ -74,6 +62,14 @@
             <mat-datepicker #duePicker></mat-datepicker>
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" [disabled]=true>
+                <mat-option value="PAID">Paid</mat-option>
+                <mat-option value="UNPAID">Unpaid</mat-option>
+            </mat-select>
+        </mat-form-field>
+
         <!-- Empty placeholders for alignment -->
         <div class="hidden xl:block"></div>
         <div class="hidden xl:block"></div>
@@ -81,7 +77,7 @@
     </form>
 </div>
 
-<app-invoice-item-table></app-invoice-item-table>
+<app-invoice-item-table [purchaseItems]="invoiceForm.get('purchaseItems')"></app-invoice-item-table>
 
 <!-- Payment Section -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -102,60 +98,74 @@
             </div>
         </div>
 
-        <form class="space-y-3">
-            <!-- Row 1: Payment Mode & Amount -->
+        <form class="space-y-3" [formGroup]="invoiceForm">
+            <!-- Taxable & shipping cost-->
             <div class="grid grid-cols-2 gap-3">
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Total</mat-label>
-                    <input matInput type="number" placeholder="0">
+                    <mat-label>Taxable Amount</mat-label>
+                    <input matInput type="number" formControlName="taxableAmount" placeholder="0" />
                     <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Shipping</mat-label>
-                    <input matInput type="number" placeholder="0">
+                    <mat-label>Shipping Cost</mat-label>
+                    <input matInput type="number" formControlName="shippingCost" placeholder="0">
                     <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
             </div>
 
-            <!-- Row 2: Payment Date & Reference -->
-            <div class="grid grid-cols-2 gap-3">
+            <!-- Row 2: TAX -->
+            <div class="grid grid-cols-3 gap-3" *ngIf="isSameState; else igstBlock">
+                
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Invoice Tax</mat-label>
-                    <input matInput type="number" placeholder="0">
-                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
+                    <mat-label>CGST</mat-label>
+                    <input matInput type="number" formControlName="cgst" 
+                        (input)="calculateInvoiceAmount()">
+                    <mat-icon matPrefix>percent</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Grand Total</mat-label>
-                    <input matInput type="number" placeholder="0">
-                    <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
+                    <mat-label>SGST</mat-label>
+                    <input matInput type="number" formControlName="sgst"
+                        (input)="calculateInvoiceAmount()">
+                    <mat-icon matPrefix>percent</mat-icon>
                 </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Round Off</mat-label>
+                    <input matInput type="number" formControlName="roundOff"
+                        (input)="calculateInvoiceAmount()">
+                    <mat-icon matPrefix>currency_rupee</mat-icon>
+                </mat-form-field>
+
             </div>
 
-            <!-- Row 3: Bank Name & Account -->
+            <ng-template #igstBlock>
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>IGST</mat-label>
+                    <input matInput type="number" formControlName="igst">
+                    <mat-icon matPrefix>percent</mat-icon>
+                </mat-form-field>
+            </ng-template>
+
+            <!-- Row 3: Invoice Amount & Grand Total -->
             <div class="grid grid-cols-2 gap-3">
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Paid</mat-label>
-                    <input matInput type="number" placeholder="0">
+                    <mat-label>Invoice Amount</mat-label>
+                    <input matInput type="number" formControlName="invoiceAmount" placeholder="0">
                     <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Balance</mat-label>
-                    <input matInput type="number" placeholder="0">
+                    <mat-label>Net Payable Amount</mat-label>
+                    <input matInput type="number" formControlName="grandTotal" placeholder="0">
                     <mat-icon matPrefix class="text-slate-400 mr-2">currency_rupee</mat-icon>
+                    <mat-hint>Net Payable amount after discount</mat-hint>
                 </mat-form-field>
             </div>
-
-            <!-- Notes -->
-            <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Notes</mat-label>
-                <textarea matInput rows="2" placeholder="Payment notes"></textarea>
-            </mat-form-field>
 
             <!-- Save Button -->
-            <button mat-flat-button color="primary" type="submit"
+            <button mat-flat-button color="primary" type="submit" (click)="onSubmit()"
                 class="w-full !h-[40px] !rounded-lg shadow-indigo-200 shadow-md hover:shadow-none transition-all !text-sm">
                 <mat-icon class="mr-1 !text-base">save</mat-icon>
                 Save Invoice

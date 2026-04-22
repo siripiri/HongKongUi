@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { Address, ClientData } from '../../model/client.model';
 import { ClientStore } from '../../stores/client.store';
 import { MatDialog } from '@angular/material/dialog';
@@ -64,7 +64,7 @@ export class Client {
     clientName: string = '';
     status: string = '';
 
-    displayedColumns: string[] = ['companyName' , 'gstNo', 'street1', 'street2', 'city', 'state', 'country', 'pincode', 'email', 'phoneNumber'];
+    displayedColumns: string[] = ['companyName' , 'gst', 'street1', 'street2', 'city', 'state', 'country', 'pincode', 'email', 'phoneNumber'];
     dataSource = new MatTableDataSource<ClientData>([]);
 
     private dialog = inject(MatDialog);
@@ -85,31 +85,53 @@ export class Client {
       return addressKeys.includes(item) ? el.address[item as keyof Address] : el[item as keyof ClientData];
     }
 
+    private handleSuccess(): void {
+      this.snackbar.open(
+        'Client added successfully ✅',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        }
+      );
+    }
+
+    private handleError(err: any): void {
+      console.error(err);
+
+      this.snackbar.open(
+        'Error adding client ❌',
+        'Close',
+        {
+          duration: 3000
+        }
+      );
+    }
+
     openAddItemDialog() {
       const dialogRef = this.dialog.open(AddClient, {
         width: '800px',
         maxWidth: '90vw',
         disableClose: true
       });
-     
+
       dialogRef.afterClosed().subscribe((result: ClientData | undefined) => {
-        if(result) {
-          this.snackbar.open(
-            'Client added successfully ✅',
-            'Close',
-            {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            }
-          );
-          this.store.addClient(result);
-        }
-        else {
+        if (!result) {
           console.log('Cancelled');
+          return;
         }
+        console.log('Submitting Client:', result);
+        this.store.addClient(result).subscribe({
+          next: () => {
+            this.handleSuccess();
+            this.store.loadClients();
+          },
+          error: (err) => {
+            this.handleError(err);
+          }
+        });
       });
-      
     }
 
     search() {}

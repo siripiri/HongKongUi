@@ -1,4 +1,5 @@
 export interface Address {
+  id: number;
   street1: string;
   street2: string;
   city: string;
@@ -8,8 +9,9 @@ export interface Address {
 }
 
 export interface ClientData {
+  id: number;
   companyName: string;
-  gstNo: string;
+  gst: string;
   address: Address;
   phoneNumber: string;
   email: string;
