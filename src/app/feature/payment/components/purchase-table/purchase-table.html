@@ -43,20 +43,19 @@
             <!-- Checkbox Column -->
             <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                                [checked]="selection.hasValue() && isAllSelected()"
-                                [indeterminate]="selection.hasValue() && !isAllSelected()"
-                                [aria-label]="checkboxLabel()">
-                </mat-checkbox>
+                    <mat-checkbox (change)="toggleAllRows()"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                    [aria-label]="checkboxLabel()">
+                    </mat-checkbox>
                 </th>
                 <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()"
-                                (change)="onRowToggle(row)"
-                                [checked]="selection.isSelected(row)"
-                                [aria-label]="checkboxLabel(row)"
-                                [disabled]="!isRowSelectable(row, amount.value)"
-                                >
-                </mat-checkbox>
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="onRowToggle(row)"
+                                    [checked]="selection.isSelected(row)"
+                                    [aria-label]="checkboxLabel(row)"
+                                    [disabled]="!isRowSelectable(row, amount.value)">
+                    </mat-checkbox>
                 </td>
             </ng-container>
 
@@ -87,7 +86,7 @@
             </ng-container>
 
             <ng-container matColumnDef="invoiceAmount">
-                <th mat-header-cell *matHeaderCellDef> No. </th>
+                <th mat-header-cell *matHeaderCellDef> Invoice Amount </th>
                 <td mat-cell *matCellDef="let element"> {{element.invoiceAmount}} </td>
             </ng-container>
 
@@ -98,23 +97,31 @@
 
             <ng-container matColumnDef="cashDiscount">
                 <th mat-header-cell *matHeaderCellDef> Cash Discount </th>
-                <td mat-cell *matCellDef="let element"> {{element.cashDiscount}} </td>
+
+                <td mat-cell *matCellDef="let element">
+
+                    <input type="number"
+                        [(ngModel)]="element.cashDiscount"
+                        (click)="$event.stopPropagation()"
+                        (ngModelChange)="onDiscountChange(element)"
+                        [disabled]="!selection.isSelected(element)"
+                        min="0"
+                        [max]="element.dueAmount" />
+
+                </td>
             </ng-container>
 
             <ng-container matColumnDef="netPayableAmount">
                 <th mat-header-cell *matHeaderCellDef> Net Payable Amount </th>
-                <td mat-cell *matCellDef="let element"> {{element.netPayableAmount}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="updatedDueAmount">
-                <th mat-header-cell *matHeaderCellDef> Updated Due Amount </th>
-                <td mat-cell *matCellDef="let element"> {{element.updatedDueAmount}} </td>
+                <td mat-cell *matCellDef="let element"> {{element.invoiceAmount - element.cashDiscount}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumn; sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumn;"
-                (click)="selection.toggle(row)">
-            </tr>
+                (click)="onRowToggle(row)"
+                [class.opacity-50]="!isRowSelectable(row, amount.value)"
+                [class.pointer-events-none]="!isRowSelectable(row, amount.value)">
+            </tr>  
         </table>
     </div>
     <div class="sticky bottom-0 bg-white border-t shadow-lg p-4">
@@ -137,21 +144,21 @@
       <div class="flex flex-col">
         <span class="text-gray-500">Total Invoice Amount</span>
         <span class="font-semibold text-gray-800">
-          ₹{{tableSummary?.totalInvoiceAmount| number:'1.2-2'}}
+          ₹{{tableSummary?.totalInvoiceAmount | number:'1.2-2'}}
         </span>
       </div>
 
       <div class="flex flex-col">
         <span class="text-gray-500">Discount</span>
         <span class="font-semibold text-yellow-600">
-          ₹{{tableSummary?.totalCashDiscount| number:'1.2-2'}}
+          ₹{{tableSummary?.totalCashDiscount | number:'1.2-2'}}
         </span>
       </div>
 
       <div class="flex flex-col">
         <span class="text-gray-500">Paying Now</span>
         <span class="font-bold text-green-600 text-base">
-          ₹{{tableSummary?.totalPayingNow| number:'1.2-2'}}
+          ₹{{tableSummary?.totalPayingNow | number:'1.2-2'}}
         </span>
       </div>
     </div>
@@ -165,7 +172,7 @@
         Remaining Balance
       </span>
       <span class="font-bold text-red-600 text-lg">
-        ₹{{123 | number:'1.2-2'}}
+        ₹{{tableSummary?.remainingBalance | number:'1.2-2'}}
       </span>
     </div>
 

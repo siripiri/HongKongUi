@@ -1,26 +1,38 @@
 <div class="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-4 mb-6">
     <div class="flex items-center justify-between mb-6">
 
+        <!-- LEFT SIDE -->
         <div class="flex items-center gap-3">
-            <!-- Icon -->
             <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
-                <mat-icon class="text-slate-700 text-[22px]">
-                    {{ isEditMode ? 'edit_document' : 'receipt_long' }}
-                </mat-icon>
+            <mat-icon class="text-slate-700 text-[22px]">
+                {{ isEditMode ? 'edit_document' : 'receipt_long' }}
+            </mat-icon>
             </div>
-            <!-- Text -->
+
             <div>
-                <h2 class="text-xl font-semibold text-slate-900 leading-tight">
-                    {{ isEditMode ? 'Edit Payment' : 'Create Payment' }}
-                </h2>
-                <p class="text-sm text-slate-500">
-                    {{ isEditMode
-                    ? 'Update payment details and save changes'
-                    : 'Enter payment details for your client'
-                    }}
-                </p>
+            <h2 class="text-xl font-semibold text-slate-900 leading-tight">
+                {{ isEditMode ? 'Edit Payment' : 'Create Payment' }}
+            </h2>
+            <p class="text-sm text-slate-500">
+                {{ isEditMode
+                ? 'Update payment details and save changes'
+                : 'Enter payment details for your client'
+                }}
+            </p>
             </div>
         </div>
+
+        <!-- RIGHT SIDE BUTTON -->
+        <button
+            mat-flat-button
+            color="primary"
+            (click)="onSubmit()"
+            [disabled]="!paymentForm.valid"
+            class="px-6 py-2 shadow-indigo-200 shadow-lg hover:shadow-none !rounded-lg">
+            
+            {{ isEditMode ? 'Update' : 'Submit' }}
+        </button>
+
     </div>
 
     <form [formGroup]="paymentForm" 
@@ -79,5 +91,5 @@
     </form>
 </div>
 
-<app-purchase-table [amount]="amount"></app-purchase-table>
+<app-purchase-table [amount]="amount" [purchases]="purchases"></app-purchase-table>
 

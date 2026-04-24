@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -37,12 +37,16 @@ export class AddPayment {
   constructor(private fb: FormBuilder) {
     this.paymentForm = this.fb.group({
       paymentType: ['UPI'],
-      amount: [0],
-      paymentDate: [''],
+      amount: [0, [Validators.required]],
+      paymentDate: ['', [Validators.required]],
       chequeNumber: [''],
       dueDate: [''],
       bankName: ['IOB'],
-      referenceId: ['']
+      referenceId: [''],
+      purchases: this.fb.group({
+        purchase: this.fb.array([], { validators: [Validators.minLength(1)] }),
+        remaininAmount: [0, [Validators.required]]
+      })
     });
     this.paymentForm.get('paymentType')?.valueChanges.subscribe(() => this.checkPaymentType())
   }
@@ -56,7 +60,13 @@ export class AddPayment {
     return this.paymentForm.get('amount') as FormControl;
   }
 
+  get purchases() {
+    return this.paymentForm.get('purchases') as FormGroup;
+  }
 
+  onSubmit() {
+    if(this.paymentForm.valid) {
+      console.log(this.paymentForm.value);
+    }
+  }
 }
-
-

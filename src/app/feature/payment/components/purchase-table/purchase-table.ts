@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectorRef, Component, effect, Input, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,22 +16,13 @@ import { InvoiceModel } from '../../../purchase/model/purchase.model';
 import { Observable } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-
-const ELEMENT_DATA: purchaseTable[] = [
-  { position: 1, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 2, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 3, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 4, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 5, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 6, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 7, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 8, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 9, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 10, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 11, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 12, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-  { position: 13, invoiceNumber: '123', companyName: 'Hello', invoiceDate: '24/05/99', dueDate: '24/03/20', invoiceAmount: 123, dueAmount: 123, cashDiscount:0, netPayableAmount: 123, updatedDueAmount: 0},
-]
+export type PurchaseFormGroup = FormGroup<{
+  purchase: FormArray<FormGroup<{
+    id: FormControl<number>;
+    cashDiscount: FormControl<number>;
+  }>>;
+  remaininAmount: FormControl<number>;
+}>;
 
 @Component({
   selector: 'app-purchase-table',
@@ -44,7 +35,8 @@ const ELEMENT_DATA: purchaseTable[] = [
     MatDatepickerModule,
     MatCheckboxModule,
     MatIconModule,
-    AutocompleteClient
+    AutocompleteClient,
+    FormsModule
   ],
   templateUrl: './purchase-table.html',
   styleUrl: './purchase-table.css',
@@ -58,9 +50,9 @@ export class PurchaseTable implements OnInit {
   tableSummary: tableSummary | undefined;
 
   @Input() amount: FormControl | any;
+  @Input() purchases!: PurchaseFormGroup;
 
-
-  displayedColumn: string[] = ['select', 'position', 'invoiceNumber', 'companyName', 'invoiceDate', 'dueDate', 'invoiceAmount', 'dueAmount', 'cashDiscount', 'netPayableAmount', 'updatedDueAmount'];
+  displayedColumn: string[] = ['select', 'position', 'invoiceNumber', 'companyName', 'invoiceDate', 'dueDate', 'invoiceAmount', 'dueAmount', 'cashDiscount', 'netPayableAmount'];
   dataSource = new MatTableDataSource<purchaseTable>([]);
   selection = new SelectionModel<purchaseTable>(true, []);
 
@@ -68,6 +60,7 @@ export class PurchaseTable implements OnInit {
     private clientStore: ClientStore,
     private invoiceStore: InvoiceStore,
     private fb: FormBuilder,
+    private cdRef: ChangeDetectorRef,
   ) {
     this.searchForm = this.fb.group({
       client: [''],
@@ -96,35 +89,80 @@ export class PurchaseTable implements OnInit {
     })
   }
 
+  syncSelectionToForm() {
+    const formArray = this.purchases.controls.purchase;
+
+    formArray.clear();
+
+    this.selection.selected.forEach(row => {
+      formArray.push(
+        this.fb.group({
+            id: new FormControl(row.id, { nonNullable: true }),
+            cashDiscount: new FormControl(row.cashDiscount || 0, { nonNullable: true })
+        })
+      );
+    });
+
+    this.purchases.controls.remaininAmount.setValue(
+      this.tableSummary?.remainingBalance || 0
+    );
+  }
+
   onRowToggle(row: purchaseTable) {
-    console.log("Triggered")
     this.selection.toggle(row);
     this.updateSummary();
+    this.syncSelectionToForm();
+    this.cdRef.detectChanges();
   }
 
   updateSummary() {
     const selectedRows = this.selection.selected;
-    let amount = this.amount.value;
+    let amount = this.amount.value || 0;
+
     const result = selectedRows.reduce((data, row) => {
+      const due = row.dueAmount || 0;
+      const cashDis = row.cashDiscount || 0;
+
       data.invoiceSelected += 1;
       data.totalCashDiscount += row.cashDiscount || 0;
-      data.totalInvoiceAmount += row.dueAmount || 0;
-      data.remainingBalance += amount - data.totalInvoiceAmount;
-      data.totalPayingNow += 0;
+      data.totalInvoiceAmount += due - cashDis;
+
+      const paying = Math.min(due, amount) - cashDis;
+      data.totalPayingNow += paying;
+
+      amount -= paying;
+
       return data;
     }, {
-      invoiceSelected: 0,
-      totalInvoiceAmount: 0,
-      totalCashDiscount: 0,
-      totalPayingNow: 0,
-      remainingBalance: 0
-    })
+        invoiceSelected: 0,
+        totalInvoiceAmount: 0,
+        totalCashDiscount: 0,
+        totalPayingNow: 0,
+        remainingBalance: 0
+    });
+    result.remainingBalance = amount;
     this.tableSummary = result;
-    console.log(selectedRows);
   }
 
   isRowSelectable(row: purchaseTable, amount: number): boolean {
-    return row.dueAmount <= amount;
+    const selectedTotal = this.selection.selected
+      .filter(r => r !== row)
+      .reduce((sum, r) => sum + (r.dueAmount - r.cashDiscount), 0);
+
+    const remaining = amount - selectedTotal;
+
+    return (row.dueAmount - row.cashDiscount) <= remaining;
+  }
+
+  onDiscountChange(row: purchaseTable) {
+    if (row.cashDiscount > row.dueAmount)
+      row.cashDiscount = row.dueAmount;
+
+    if (row.cashDiscount < 0)
+      row.cashDiscount = 0;
+
+    this.updateSummary();
+    this.syncSelectionToForm();
   }
 
   handleAmountChange(amount: number) {
@@ -134,21 +172,13 @@ export class PurchaseTable implements OnInit {
     
     this.selection.clear();
     this.selection.select(...validSelections);
-
-     // Optional: update table values
-    // this.dataSource.data = this.dataSource.data.map(row => ({
-    //   ...row,
-    //   updatedDueAmount:
-    //     this.isRowSelectable(row, amount)
-    //       ? row.dueAmount
-    //       : 0
-    // }));
   }
 
   convertToTableItems() {
     this.invoices.filter(invoice => ['UNPAID', 'PENDING'].includes(invoice.status))
       .forEach((invoice: InvoiceModel, index: number) => {
         const invoiceTable: purchaseTable = {
+          id: invoice.id,
           position: index,
           invoiceNumber: invoice.invoiceNumber,
           companyName: invoice.client?.companyName,
@@ -196,17 +226,24 @@ export class PurchaseTable implements OnInit {
   }
 
   isAllSelected() {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+    const selectableRows = this.dataSource.data
+      .filter(row => this.isRowSelectable(row, this.amount.value));
+
+    return this.selection.selected.length === selectableRows.length;
   }
 
   toggleAllRows() {
     if (this.isAllSelected()) {
       this.selection.clear();
-      return;
+    } else {
+      this.dataSource.data.forEach(row => {
+        if (this.isRowSelectable(row, this.amount.value)) {
+          this.selection.select(row);
+        }
+      });
     }
-    this.selection.select(...this.dataSource.data);
+    this.updateSummary();
+    this.syncSelectionToForm();
   }
 
   checkboxLabel(row?: purchaseTable): string {

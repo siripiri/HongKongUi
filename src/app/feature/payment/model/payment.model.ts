@@ -1,6 +1,4 @@
-import { O } from "@angular/cdk/keycodes";
 import { InvoiceModel } from "../../purchase/model/purchase.model";
-import { ClientData } from "../../client/model/client.model";
 
 export interface Payment {
     id: number;
@@ -21,6 +19,7 @@ export interface PaymentDetails {
 }
 
 export interface purchaseTable {
+    id: number;
     position: number;
     invoiceNumber: string;
     companyName: string;
