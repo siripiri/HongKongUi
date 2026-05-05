@@ -23,7 +23,7 @@ export const routes: Routes = [
         path: 'payments',
         data: { breadcrumb: 'Payments Management' },
         children: [
-            { path: '', component: Payments },
+            { path: '', component: Payments},
             { path: 'payment', component: AddPayment, data: { breadcrumb: 'add new payment' }},
         ]
     }

@@ -1,21 +1,20 @@
-import { InvoiceModel } from "../../purchase/model/purchase.model";
-
-export interface Payment {
-    id: number;
+export interface AddPaymentModel {
     paymentType: string;
     amount: number;
-    status: number;
-    amountApplied: number;
     paymentDate: string;
-    paymentDetails: PaymentDetails;
-    purchases: InvoiceModel
-}
-
-export interface PaymentDetails {
-    referenceId: string;
     chequeNumber: string;
     dueDate: string;
     bankName: string;
+    referenceId: string;
+    purchases: {
+        purchase: AddPaymentPurchaseModel;
+        remainingAmount: number;
+    };
+}
+
+export interface AddPaymentPurchaseModel {
+    id: number;
+    cashDiscount: number;
 }
 
 export interface purchaseTable {
@@ -40,3 +39,32 @@ export interface tableSummary {
     remainingBalance: number;
 }
 
+export interface PaymentModel {
+    id: number;
+    paymentType: string;
+    amount: number;
+    status: number;
+    remainingAmount: number;
+    paymentDate: string;
+    paymentDetails: PaymentDetailModel;
+}
+
+export interface PaymentDetailModel {
+    id: number;
+    referenceId: string;
+    chequeNumber: string;
+    dueDate: string;
+    bankName: string;
+}
+
+export interface AddPaymentResponse {
+    payment: PaymentModel;
+    purchasePaymentList: PurchasePaymentMap[];
+}
+
+export interface PurchasePaymentMap {
+    id: number;
+    purchaseId: number;
+    paymentId: number;
+    amountApplied: number;
+}

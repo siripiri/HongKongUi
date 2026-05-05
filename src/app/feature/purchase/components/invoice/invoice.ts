@@ -48,7 +48,6 @@ export class Invoice implements OnInit {
 
   constructor(private formBuilder: FormBuilder, 
     private invoiceStore: InvoiceStore,
-    private clientStore: ClientStore,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
@@ -95,10 +94,10 @@ export class Invoice implements OnInit {
         }
       })
     }
-    this.clientStore.loadClients();
   }
 
   parseForm(invoice: InvoiceModel) {
+    // Patch form values except purchaseItems and taxableAmount
     this.invoiceForm.patchValue({
       invoiceNumber: invoice.invoiceNumber,
       orderNumber: invoice.orderNumber,
@@ -106,9 +105,7 @@ export class Invoice implements OnInit {
       client: invoice.client,
       invoiceDate: invoice.invoiceDate,
       dueDate: invoice.dueDate,
-      taxableAmount: invoice.taxableAmount,
       shippingCost: invoice.shippingCost,
-      purchaseItems: invoice.purchaseItems,
       cgst: invoice.cgst,
       sgst: invoice.sgst,
       igst: invoice.igst,
@@ -116,7 +113,8 @@ export class Invoice implements OnInit {
       invoiceAmount: invoice.invoiceAmount,
       grandTotal: invoice.grandTotal
     });
-    console.log('invoice Item:', invoice.purchaseItems);
+    
+    // Set purchaseItems first, which triggers valueChanges and calculates taxableAmount
     this.invoiceForm.setControl(
       'purchaseItems',
       this.formBuilder.array(
@@ -125,6 +123,15 @@ export class Invoice implements OnInit {
         ) || []
       )
     );
+    
+    // Patch taxableAmount after purchaseItems are set to ensure correct calculation
+    this.invoiceForm.patchValue({
+      taxableAmount: invoice.taxableAmount
+    });
+    
+    console.log('formValue', this.invoiceForm.value)
+    console.log('invoice model:', invoice);
+    console.log('invoice Item:', invoice.purchaseItems);
   }
 
   createItemFormGroup(item: InvoiceItem): FormGroup {
@@ -164,32 +171,42 @@ export class Invoice implements OnInit {
   calculateInvoiceAmount() {
     const {
       taxableAmount = 0,
+      shippingCost = 0,
       cgst = 0,
       sgst = 0,
-      igst = 0,
-      roundOff = 0
+      igst = 0
     } = this.invoiceForm.value;
 
     const baseAmount = Number(taxableAmount) || 0;
+    const shipping = Number(shippingCost) || 0;
     const cgstPct = Number(cgst) || 0;
     const sgstPct = Number(sgst) || 0;
     const igstPct = Number(igst) || 0;
-    const round = Number(roundOff) || 0;
 
+    // Calculate total tax on taxable amount
     const totalTax =
       (baseAmount * cgstPct) / 100 +
       (baseAmount * sgstPct) / 100 +
       (baseAmount * igstPct) / 100;
 
-    const invoiceAmount = baseAmount + totalTax - round;
+    // Calculate gross amount before rounding
+    const grossAmount = baseAmount + shipping + totalTax;
+
+    // Calculate round off: difference to nearest integer (can be positive or negative)
+    const roundedAmount = Math.round(grossAmount);
+    const roundOffAmount = grossAmount - roundedAmount;
+    
+    // Final invoice amount after rounding to nearest integer
+    const invoiceAmount = roundedAmount;
 
     this.invoiceForm.patchValue({
-      invoiceAmount: + invoiceAmount.toFixed(2)
+      roundOff: Number(roundOffAmount.toFixed(2)),
+      invoiceAmount: invoiceAmount
     });
   }
 
   checkState(invoice: any) {
-    if(invoice.client.address.state.toLowerCase() == 'tamil nadu')
+    if(invoice.client.address.state?.toLowerCase() == 'tamil nadu')
       this.isSameState = true
   }
 

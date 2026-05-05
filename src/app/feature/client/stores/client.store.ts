@@ -15,7 +15,7 @@ export class ClientStore {
 
         this.api.getClients().subscribe({
             next: (data) => {
-                console.log(data);
+                console.log('client:', data);
                 this.clients.set(data);
                 this.loading.set(false);
             },

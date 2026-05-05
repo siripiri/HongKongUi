@@ -21,7 +21,7 @@ export type PurchaseFormGroup = FormGroup<{
     id: FormControl<number>;
     cashDiscount: FormControl<number>;
   }>>;
-  remaininAmount: FormControl<number>;
+  remainingAmount: FormControl<number>;
 }>;
 
 @Component({
@@ -82,7 +82,6 @@ export class PurchaseTable implements OnInit {
   }
 
   ngOnInit(): void {
-    this.clientStore.loadClients();
     this.setUpFilter();
     this.amount.valueChanges.subscribe((value: number) => {
       this.handleAmountChange(value);
@@ -103,7 +102,7 @@ export class PurchaseTable implements OnInit {
       );
     });
 
-    this.purchases.controls.remaininAmount.setValue(
+    this.purchases.controls.remainingAmount.setValue(
       this.tableSummary?.remainingBalance || 0
     );
   }
@@ -120,14 +119,14 @@ export class PurchaseTable implements OnInit {
     let amount = this.amount.value || 0;
 
     const result = selectedRows.reduce((data, row) => {
-      const due = row.dueAmount || 0;
+      const invoiceAmount = row.invoiceAmount || 0;
       const cashDis = row.cashDiscount || 0;
 
       data.invoiceSelected += 1;
       data.totalCashDiscount += row.cashDiscount || 0;
-      data.totalInvoiceAmount += due - cashDis;
+      data.totalInvoiceAmount += invoiceAmount;
 
-      const paying = Math.min(due, amount) - cashDis;
+      const paying = Math.min(invoiceAmount-cashDis, amount);
       data.totalPayingNow += paying;
 
       amount -= paying;
@@ -146,12 +145,12 @@ export class PurchaseTable implements OnInit {
 
   isRowSelectable(row: purchaseTable, amount: number): boolean {
     const selectedTotal = this.selection.selected
-      .filter(r => r !== row)
-      .reduce((sum, r) => sum + (r.dueAmount - r.cashDiscount), 0);
+      .filter(r => r.id !== row.id)
+      .reduce((sum, r) => sum + (r.invoiceAmount - r.cashDiscount), 0);
 
     const remaining = amount - selectedTotal;
 
-    return (row.dueAmount - row.cashDiscount) <= remaining;
+    return (row.invoiceAmount - row.cashDiscount) <= remaining;
   }
 
   onDiscountChange(row: purchaseTable) {

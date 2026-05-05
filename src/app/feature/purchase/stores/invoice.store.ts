@@ -1,8 +1,8 @@
-import { Injectable, signal } from "@angular/core";
+import { computed, Injectable, signal } from "@angular/core";
 import { InvoiceModel } from "../model/purchase.model";
 import { InvoiceService } from "../service/invoice.service";
 import { tap } from "rxjs/operators";
-import { of } from "rxjs";
+import { combineLatest, of } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceStore {
@@ -51,4 +51,9 @@ export class InvoiceStore {
       })
     );
   }
+
+  purchasesMap = computed(() => {
+    const purchases = this.purchases();
+    return new Map(purchases.map(p => [p.id, p]));
+  })
 }

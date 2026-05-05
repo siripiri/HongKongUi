@@ -105,9 +105,6 @@ export class Purchase {
     }
 
     ngOnInit() {
-      this.purchaseStore.loadPurchases();
-      this.clientStore.loadClients();
-
       this.setupFilter();
     }
 
